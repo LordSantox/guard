@@ -59,7 +59,8 @@ guard does not reinvent auditing: on session start it checks whether these are i
 ## Commands
 
 ```
-/guard                    log (last 15)
+/guard                    open the Guard panel (log, mode, allowed rules)
+/guard log                text log (last 15)
 /guard avisar             warn mode (default)
 /guard bloquear           block mode: also blocks "high" rules
 /guard permitir <rule>    disable a rule

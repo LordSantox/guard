@@ -59,7 +59,8 @@ guard no reinventa la auditoría: al iniciar la sesión revisa si están instala
 ## Comandos
 
 ```
-/guard                    bitácora (últimos 15)
+/guard                    abre el panel Guard (bitácora, modo, reglas permitidas)
+/guard log                bitácora en texto (últimos 15)
 /guard avisar             modo avisar (por defecto)
 /guard bloquear           modo bloquear: también bloquea las "high"
 /guard permitir <regla>   desactiva una regla
