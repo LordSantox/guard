@@ -1,0 +1,6 @@
+{
+  "name": "guard",
+  "description": "guard: safety guardrails mod for Claude Code",
+  "owner": { "name": "LordSantox" },
+  "plugins": [{ "name": "guard", "source": "./" }]
+}
