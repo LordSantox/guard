@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 
-import { blocks, check, checkCommand } from './rules'
+import { blocks, check, checkCommand, isCommit, isPkgInstall, isReview } from './rules'
 
 const bad: Array<[string, string]> = [
   ['rm -rf /', 'rm-root'],
@@ -51,4 +51,17 @@ test('modo avisar solo bloquea critical', () => {
   expect(blocks(high, 'bloquear', [])).toBe(true)
   expect(blocks(crit, 'avisar', [])).toBe(true)
   expect(blocks(crit, 'avisar', ['rm-root'])).toBe(false)
+})
+
+test('revisión antes de commit y paquetes', () => {
+  expect(isCommit('git commit -m "x"')).toBe(true)
+  expect(isCommit('git push origin main')).toBe(true)
+  expect(isCommit('git status')).toBe(false)
+  expect(isReview('differential-review:differential-review')).toBe(true)
+  expect(isReview('diff-review')).toBe(true)
+  expect(isReview('frontend-design')).toBe(false)
+  expect(isPkgInstall('npm install lodash')).toBe(true)
+  expect(isPkgInstall('pip install requests')).toBe(true)
+  expect(isPkgInstall('npm install')).toBe(false)
+  expect(isPkgInstall('pip install -r requirements.txt')).toBe(false)
 })

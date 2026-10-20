@@ -101,6 +101,14 @@ export function check(tool: string, input: any): Hit | undefined {
   return undefined
 }
 
+// Revisión antes de commit: se apoya en las skills de Trail of Bits (trailofbits/skills).
+export const isCommit = (cmd: string) => /\bgit\s+(commit|push)\b/i.test(normalize(cmd))
+export const isEdit = (tool: string) => /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(tool)
+export const isReview = (name: string) => /differential-review|diff-review|security-review/i.test(name)
+export const isPkgInstall = (cmd: string) =>
+  /\b(npm|pnpm|yarn|bun)\s+(i|install|add)\s+(?!-)\S|\bpip3?\s+install\s+(?!-r\b)(?!-e\b)\S|\bcargo\s+add\b|\bgo\s+get\b/i.test(normalize(cmd))
+export const NO_REVIEW: Hit = { rule: 'no-review', sev: 'high', why: 'commit/push sin revisión de seguridad del diff' }
+
 // critical bloquea siempre; high bloquea solo en modo 'bloquear'.
 export type Mode = 'avisar' | 'bloquear'
 export const blocks = (h: Hit, mode: Mode, allowed: readonly string[]) =>

@@ -1,6 +1,6 @@
 import type { Register } from 'claude-code'
 
-import { blocks, check, type Hit, type Mode } from './rules'
+import { blocks, check, isCommit, isEdit, isPkgInstall, isReview, NO_REVIEW, type Hit, type Mode } from './rules'
 
 const MAX_LOG = 50
 type Entry = { at: number; tool: string; rule: string; sev: string; why: string; blocked: boolean; what: string }
@@ -63,11 +63,29 @@ export const register: Register = on => {
     return { text: [`guard · modo ${mode}${allowed.length ? ` · permitidas: ${allowed.join(', ')}` : ''}`, ...(rows.length ? rows : ['Sin eventos.']), '', HELP].join('\n') }
   })
 
+  // Revisión registrada al usar la skill o el comando de Trail of Bits (o /security-review).
+  on('command.run', async ($, e, next) => {
+    if (isReview(e.command)) await $.store.set('pending', false)
+    return next(e)
+  })
+
   on('tool.call', async ($, e, next) => {
     const ev = e as any
     const tool = String(ev.tool ?? '')
-    const hit: Hit | undefined = check(tool, ev)
-    if (!hit) return next(e)
+    if (tool === 'Skill' && isReview(String(ev.skill ?? ''))) await $.store.set('pending', false)
+    const cmd = tool === 'Bash' || tool === 'PowerShell' ? String(ev.command ?? '') : ''
+    let hit: Hit | undefined = check(tool, ev)
+    if (!hit && cmd && isCommit(cmd) && (await $.store.get('pending'))) hit = NO_REVIEW
+    if (!hit) {
+      const r = await next(e)
+      if (r.deny !== undefined) return r
+      if (isEdit(tool)) await $.store.set('pending', true)
+      if (cmd && isCommit(cmd) && !r.isError) await $.store.set('pending', false)
+      if (cmd && isPkgInstall(cmd)) {
+        return { ...r, context: [...(r.context ?? []), 'guard: dependencia nueva. Si está instalada, usa la skill supply-chain-risk-auditor (Trail of Bits) para evaluar su riesgo.'] }
+      }
+      return r
+    }
     const { mode, allowed } = await cfg($)
     if (allowed.includes(hit.rule)) return next(e)
     const blocked = blocks(hit, mode, allowed)
@@ -79,6 +97,7 @@ export const register: Register = on => {
     $.ui.toast(`🛡 guard: ${hit.why} (${tool})`)
     const r = await next(e)
     if (r.deny !== undefined) return r
+    if (cmd && isCommit(cmd) && !r.isError) await $.store.set('pending', false)
     return { ...r, context: [...(r.context ?? []), `guard: aviso ${hit.rule} (${hit.why}). Confirma que el usuario lo pidió; si no, revierte.`] }
   // Si el guard falla, deja pasar (no bloquea el trabajo por un bug propio); el fallo queda en el log de debug.
   }).catch(($, e, next) => next(e))

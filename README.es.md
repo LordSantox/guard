@@ -44,6 +44,18 @@ Modo por defecto **avisar**: las reglas `high` dejan pasar la acción, muestran 
 
 Normaliza antes de comparar: atrapa `r''m`, `\rm`, `X=rm; $X -rf /`, `bash -c "…"` y cadenas con `&&`. Deja pasar `rm -rf node_modules`, `.env.example` y `--force-with-lease`.
 
+## Revisión antes de commit (con Trail of Bits)
+
+guard no reinventa la auditoría: se apoya en [trailofbits/skills](https://github.com/trailofbits/skills). Instala las recomendadas:
+
+```
+/plugin install differential-review --marketplace trailofbits/skills
+/plugin install supply-chain-risk-auditor --marketplace trailofbits/skills
+```
+
+- Si Claude editó archivos, un `git commit`/`push` sin revisión de seguridad activa la regla `no-review` (high): avisa en modo avisar y bloquea en modo bloquear. Correr `differential-review`, `/diff-review` o `/security-review` la libera.
+- Ante `npm install <paquete>`, `pip install <paquete>`, `cargo add` o `go get`, guard le indica a Claude usar `supply-chain-risk-auditor`.
+
 ## Comandos
 
 ```

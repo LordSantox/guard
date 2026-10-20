@@ -44,6 +44,18 @@ Default mode is **warn**: `high` rules let the action run, show a toast and add 
 
 It normalizes before matching, so `r''m`, `\rm`, `X=rm; $X -rf /`, `bash -c "…"` and `a && b` chains are caught. `rm -rf node_modules`, `.env.example` and `--force-with-lease` are allowed.
 
+## Review before commit (with Trail of Bits)
+
+guard does not reinvent auditing: it relies on [trailofbits/skills](https://github.com/trailofbits/skills). Install the recommended ones:
+
+```
+/plugin install differential-review --marketplace trailofbits/skills
+/plugin install supply-chain-risk-auditor --marketplace trailofbits/skills
+```
+
+- After Claude edits files, a `git commit`/`push` without a security review triggers rule `no-review` (high): warns in warn mode, blocks in block mode. Running `differential-review`, `/diff-review` or `/security-review` clears it.
+- On `npm install <pkg>`, `pip install <pkg>`, `cargo add`, `go get`, guard tells Claude to run `supply-chain-risk-auditor`.
+
 ## Commands
 
 ```
