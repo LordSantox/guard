@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 
-import { blocks, check, checkCommand, isCommit, isPkgInstall, isReview } from './rules'
+import { blocks, check, checkCommand, isCommit, isPkgInstall, isReview, missingTob } from './rules'
 
 const bad: Array<[string, string]> = [
   ['rm -rf /', 'rm-root'],
@@ -64,4 +64,11 @@ test('revisión antes de commit y paquetes', () => {
   expect(isPkgInstall('pip install requests')).toBe(true)
   expect(isPkgInstall('npm install')).toBe(false)
   expect(isPkgInstall('pip install -r requirements.txt')).toBe(false)
+})
+
+test('detecta skills de Trail of Bits faltantes', () => {
+  expect(missingTob(undefined).length).toBe(2)
+  expect(missingTob({ 'differential-review@trailofbits': true }).join()).toBe('supply-chain-risk-auditor')
+  expect(missingTob({ 'differential-review@trailofbits': false }).length).toBe(2)
+  expect(missingTob({ 'differential-review@x': true, 'supply-chain-risk-auditor@x': true }).length).toBe(0)
 })

@@ -107,6 +107,13 @@ export const isEdit = (tool: string) => /^(Write|Edit|MultiEdit|NotebookEdit)$/.
 export const isReview = (name: string) => /differential-review|diff-review|security-review/i.test(name)
 export const isPkgInstall = (cmd: string) =>
   /\b(npm|pnpm|yarn|bun)\s+(i|install|add)\s+(?!-)\S|\bpip3?\s+install\s+(?!-r\b)(?!-e\b)\S|\bcargo\s+add\b|\bgo\s+get\b/i.test(normalize(cmd))
+export const TOB = ['differential-review', 'supply-chain-risk-auditor']
+// enabledPlugins usa claves "<plugin>@<marketplace>".
+export const missingTob = (enabled: unknown) => {
+  const keys = Object.entries((enabled ?? {}) as Record<string, unknown>).filter(([, on]) => on).map(([k]) => k.split('@')[0])
+  return TOB.filter(p => !keys.includes(p))
+}
+export const installLines = (names: string[]) => names.map(n => `/plugin install ${n} --marketplace trailofbits/skills`)
 export const NO_REVIEW: Hit = { rule: 'no-review', sev: 'high', why: 'commit/push sin revisión de seguridad del diff' }
 
 // critical bloquea siempre; high bloquea solo en modo 'bloquear'.

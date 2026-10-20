@@ -46,7 +46,7 @@ Normaliza antes de comparar: atrapa `r''m`, `\rm`, `X=rm; $X -rf /`, `bash -c "�
 
 ## Revisión antes de commit (con Trail of Bits)
 
-guard no reinventa la auditoría: se apoya en [trailofbits/skills](https://github.com/trailofbits/skills). Instala las recomendadas:
+guard no reinventa la auditoría: al iniciar la sesión revisa si están instaladas y, si faltan, muestra un aviso y los comandos de instalación en `/guard`. Se apoya en [trailofbits/skills](https://github.com/trailofbits/skills). Instala las recomendadas:
 
 ```
 /plugin install differential-review --marketplace trailofbits/skills
@@ -65,6 +65,7 @@ guard no reinventa la auditoría: se apoya en [trailofbits/skills](https://githu
 /guard permitir <regla>   desactiva una regla
 /guard quitar <regla>     la vuelve a activar
 /guard limpiar            borra la bitácora
+/guard ocultar            deja de sugerir instalar Trail of Bits
 ```
 
 ## Límites

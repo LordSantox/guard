@@ -1,6 +1,6 @@
 import type { Register } from 'claude-code'
 
-import { blocks, check, isCommit, isEdit, isPkgInstall, isReview, NO_REVIEW, type Hit, type Mode } from './rules'
+import { blocks, check, installLines, isCommit, missingTob, isEdit, isPkgInstall, isReview, NO_REVIEW, type Hit, type Mode } from './rules'
 
 const MAX_LOG = 50
 type Entry = { at: number; tool: string; rule: string; sev: string; why: string; blocked: boolean; what: string }
@@ -19,6 +19,8 @@ async function log($: any, entry: Entry) {
   $.ui.status(`🛡 guard: ${b} bloqueos · ${list.length + 1 - b} avisos`)
 }
 
+const missing = async ($: any) => { try { return missingTob((await $.settings.read()).enabledPlugins) } catch { return [] } }
+
 const what = (e: any) => String(e.command ?? e.file_path ?? e.notebook_path ?? '').slice(0, 120)
 
 const HELP = [
@@ -28,11 +30,16 @@ const HELP = [
   '/guard permitir <regla>  desactiva una regla',
   '/guard quitar <regla>    la vuelve a activar',
   '/guard limpiar         borra la bitácora',
+  '/guard ocultar         no avisar más de las skills de Trail of Bits',
 ].join('\n')
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'guard', description: 'Guard: bitácora, modo avisar/bloquear y reglas permitidas' })
+    const miss = await missing($)
+    if (miss.length && !(await $.store.get('hideTob'))) {
+      $.ui.toast(`🛡 guard: faltan skills de Trail of Bits (${miss.join(', ')}). Escribe /guard para ver cómo instalarlas.`)
+    }
     return next(e)
   })
 
@@ -56,11 +63,17 @@ export const register: Register = on => {
       $.ui.status(undefined)
       return { text: 'guard: bitácora borrada.' }
     }
+    if (verb === 'ocultar') {
+      await $.store.set('hideTob', true)
+      return { text: 'guard: no avisaré más de Trail of Bits.' }
+    }
     if (verb) return { text: HELP }
     const list = ((await $.store.get('log')) as Entry[]) ?? []
     const rows = list.slice(-15).reverse().map(x =>
       `${new Date(x.at).toLocaleTimeString()} ${x.blocked ? 'BLOQUEO' : 'aviso  '} ${x.rule} (${x.sev}) ${x.tool}: ${x.what}`)
-    return { text: [`guard · modo ${mode}${allowed.length ? ` · permitidas: ${allowed.join(', ')}` : ''}`, ...(rows.length ? rows : ['Sin eventos.']), '', HELP].join('\n') }
+    const miss = await missing($)
+    const tob = miss.length ? ['', `Recomendado: skills de Trail of Bits para revisar el código (faltan ${miss.length}):`, ...installLines(miss)] : []
+    return { text: [`guard · modo ${mode}${allowed.length ? ` · permitidas: ${allowed.join(', ')}` : ''}`, ...(rows.length ? rows : ['Sin eventos.']), ...tob, '', HELP].join('\n') }
   })
 
   // Revisión registrada al usar la skill o el comando de Trail of Bits (o /security-review).

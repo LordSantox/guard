@@ -1,6 +1,6 @@
 {
   "name": "guard",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Guardrails for Claude Code: warns on or blocks dangerous commands, secret access and self-config edits, with a log and /guard.",
   "author": { "name": "LordSantox" }
 }

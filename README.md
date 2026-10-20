@@ -46,7 +46,7 @@ It normalizes before matching, so `r''m`, `\rm`, `X=rm; $X -rf /`, `bash -c "…
 
 ## Review before commit (with Trail of Bits)
 
-guard does not reinvent auditing: it relies on [trailofbits/skills](https://github.com/trailofbits/skills). Install the recommended ones:
+guard does not reinvent auditing: on session start it checks whether these are installed and, if not, shows a toast and the install lines in `/guard`. It relies on [trailofbits/skills](https://github.com/trailofbits/skills). Install the recommended ones:
 
 ```
 /plugin install differential-review --marketplace trailofbits/skills
@@ -65,6 +65,7 @@ guard does not reinvent auditing: it relies on [trailofbits/skills](https://gith
 /guard permitir <rule>    disable a rule
 /guard quitar <rule>      re-enable it
 /guard limpiar            clear the log
+/guard ocultar            stop the Trail of Bits install hint
 ```
 
 The UI text is in Spanish.
