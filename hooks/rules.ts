@@ -104,7 +104,7 @@ export function check(tool: string, input: any): Hit | undefined {
 // Revisión antes de commit: se apoya en las skills de Trail of Bits (trailofbits/skills).
 export const isCommit = (cmd: string) => /\bgit\s+(commit|push)\b/i.test(normalize(cmd))
 export const isEdit = (tool: string) => /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(tool)
-export const isReview = (name: string) => /differential-review|diff-review|security-review/i.test(name)
+export const isReview = (name: string) => /guard-review|differential-review|diff-review|security-review/i.test(name)
 export const isPkgInstall = (cmd: string) =>
   /\b(npm|pnpm|yarn|bun)\s+(i|install|add)\s+(?!-)\S|\bpip3?\s+install\s+(?!-r\b)(?!-e\b)\S|\bcargo\s+add\b|\bgo\s+get\b/i.test(normalize(cmd))
 export const TOB = ['differential-review', 'supply-chain-risk-auditor']

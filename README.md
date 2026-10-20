@@ -53,7 +53,7 @@ guard does not reinvent auditing: on session start it checks whether these are i
 /plugin install supply-chain-risk-auditor --marketplace trailofbits/skills
 ```
 
-- After Claude edits files, a `git commit`/`push` without a security review triggers rule `no-review` (high): warns in warn mode, blocks in block mode. Running `differential-review`, `/diff-review` or `/security-review` clears it.
+- After Claude edits files, a `git commit`/`push` without a security review triggers rule `no-review` (high): warns in warn mode, blocks in block mode. guard ships its own short skill, `guard-review` (diff only, ≤10-line answer), which Claude is told to run; `differential-review`, `/diff-review` or `/security-review` also clear it.
 - On `npm install <pkg>`, `pip install <pkg>`, `cargo add`, `go get`, guard tells Claude to run `supply-chain-risk-auditor`.
 
 ## Commands

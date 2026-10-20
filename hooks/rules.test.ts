@@ -59,6 +59,7 @@ test('revisión antes de commit y paquetes', () => {
   expect(isCommit('git status')).toBe(false)
   expect(isReview('differential-review:differential-review')).toBe(true)
   expect(isReview('diff-review')).toBe(true)
+  expect(isReview('guard:guard-review')).toBe(true)
   expect(isReview('frontend-design')).toBe(false)
   expect(isPkgInstall('npm install lodash')).toBe(true)
   expect(isPkgInstall('pip install requests')).toBe(true)

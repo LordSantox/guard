@@ -103,15 +103,16 @@ export const register: Register = on => {
     if (allowed.includes(hit.rule)) return next(e)
     const blocked = blocks(hit, mode, allowed)
     await log($, { at: Date.now(), tool, rule: hit.rule, sev: hit.sev, why: hit.why, blocked, what: what(ev) })
+    const fix = hit.rule === 'no-review' ? ' Usa la skill guard-review (revisión corta del diff) y luego reintenta.' : ''
     if (blocked) {
       $.ui.toast(`🛡 guard bloqueó ${tool}: ${hit.why}`)
-      return { deny: `guard: bloqueado (${hit.rule}: ${hit.why}). Si el usuario lo quiere de verdad, que lo ejecute él o use /guard permitir ${hit.rule}.` }
+      return { deny: `guard: bloqueado (${hit.rule}: ${hit.why}). Si el usuario lo quiere de verdad, que lo ejecute él o use /guard permitir ${hit.rule}.${fix}` }
     }
     $.ui.toast(`🛡 guard: ${hit.why} (${tool})`)
     const r = await next(e)
     if (r.deny !== undefined) return r
     if (cmd && isCommit(cmd) && !r.isError) await $.store.set('pending', false)
-    return { ...r, context: [...(r.context ?? []), `guard: aviso ${hit.rule} (${hit.why}). Confirma que el usuario lo pidió; si no, revierte.`] }
+    return { ...r, context: [...(r.context ?? []), `guard: aviso ${hit.rule} (${hit.why}). ${fix || 'Confirma que el usuario lo pidió; si no, revierte.'}`] }
   // Si el guard falla, deja pasar (no bloquea el trabajo por un bug propio); el fallo queda en el log de debug.
   }).catch(($, e, next) => next(e))
 }

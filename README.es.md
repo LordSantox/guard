@@ -53,7 +53,7 @@ guard no reinventa la auditoría: al iniciar la sesión revisa si están instala
 /plugin install supply-chain-risk-auditor --marketplace trailofbits/skills
 ```
 
-- Si Claude editó archivos, un `git commit`/`push` sin revisión de seguridad activa la regla `no-review` (high): avisa en modo avisar y bloquea en modo bloquear. Correr `differential-review`, `/diff-review` o `/security-review` la libera.
+- Si Claude editó archivos, un `git commit`/`push` sin revisión de seguridad activa la regla `no-review` (high): avisa en modo avisar y bloquea en modo bloquear. guard trae su propia skill corta, `guard-review` (solo el diff, respuesta de ≤10 líneas), que se le pide a Claude correr; `differential-review`, `/diff-review` o `/security-review` también la liberan.
 - Ante `npm install <paquete>`, `pip install <paquete>`, `cargo add` o `go get`, guard le indica a Claude usar `supply-chain-risk-auditor`.
 
 ## Comandos
